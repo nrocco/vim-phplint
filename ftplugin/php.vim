@@ -1,6 +1,7 @@
 function! RunPhplint()
-  let l:filename=@%
-  let l:phplint_output=system('php -l '.l:filename.'|grep -v "Errors parsing"')
+  let l:phplint_exe=get(g:, 'phplint_exe', '')
+  let l:filename=shellescape(expand('%:p'))
+  let l:phplint_output=system(l:phplint_exe .' php -l ' . l:filename)
   let l:phplint_list=split(l:phplint_output, "\n")
 
   if v:shell_error
@@ -15,4 +16,3 @@ endfunction
 
 set errorformat=%m\ in\ %f\ on\ line\ %l
 command! Phplint call RunPhplint()
-
