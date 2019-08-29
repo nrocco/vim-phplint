@@ -1,18 +1,23 @@
-function! RunPhplint()
-  let l:filename=@%
-  let l:phplint_output=system('php -l '.l:filename)
-  let l:phplint_list=split(l:phplint_output, "\n")
+if exists("b:did_ftplugin_php_lint") || !executable("php")
+  finish
+endif
+
+command! -buffer Phplint call s:Phplint()
+
+function! s:Phplint() abort
+  let filename = fnamemodify(expand("%"), ":~:.")
+  let output = system('php -l ' . shellescape(filename))
 
   if v:shell_error
-    cexpr l:phplint_list[:-2]
+    let lines = split(output, "\n")
+    cexpr lines[:-2]
     copen
-    exec "nnoremap <silent> <buffer> q :ccl<CR>"
   else
     cclose
-    echomsg l:phplint_list[0]
+    echomsg "No syntax errors"
   endif
 endfunction
 
 set errorformat=%m\ in\ %f\ on\ line\ %l
-command! Phplint call RunPhplint()
 
+let b:did_ftplugin_php_lint = 1
